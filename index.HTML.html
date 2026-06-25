@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIFA Elegant E-commerce</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .bg-gold { background-color: #d4af37; }
+        .text-gold { color: #d4af37; }
+        .hover-gold:hover { color: #d4af37; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .dark .glass { background: rgba(0, 0, 0, 0.2); }
+    </style>
+</head>
+<body class="bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white transition-colors duration-300">
+
+    <div id="topBar" class="fixed top-0 w-full z-[60] bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 text-xs py-2 px-4 flex justify-end items-center">
+        <button onclick="toggleTheme()" class="mr-4 text-gray-500 dark:text-gray-400 hover:text-gold transition">🌙 / ☀️</button>
+        <div id="authArea" class="flex items-center">
+            <button id="loginBtn" onclick="toggleLogin()" class="text-gray-500 dark:text-gray-400 hover:text-gold transition">Login</button>
+        </div>
+    </div>
+
+    <nav class="fixed top-[32px] w-full z-50 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800 p-4 transition-colors">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gold cursor-pointer" onclick="window.location.reload()">TIFA</h1>
+            <div class="hidden md:flex space-x-6 text-sm items-center">
+                <a href="#home" class="hover-gold transition">Beranda</a>
+                <a href="#products" class="hover-gold transition">Produk</a>
+                <a href="#faq" class="hover-gold transition">FAQ</a>
+                <a href="#kontak" class="hover-gold transition">Kontak</a>
+            </div>
+            <button onclick="toggleCart()" class="bg-neutral-100 dark:bg-neutral-800 p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition">
+                🛒 <span id="cartCount" class="bg-gold text-white text-[10px] font-bold rounded-full px-1.5">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <section id="home" class="pt-40 pb-20 text-center px-4">
+        <h2 class="text-5xl font-bold mb-6">Elegan dalam Setiap Detail</h2>
+        <p class="text-gray-600 dark:text-gray-400 max-w-xl mx-auto mb-8">Temukan koleksi pilihan TIFA yang dirancang untuk kenyamanan dan gaya hidup modern Anda.</p>
+        <a href="#products" class="bg-gold text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition">Belanja Sekarang</a>
+    </section>
+
+    <section id="products" class="py-20 max-w-6xl mx-auto px-4">
+        <h2 class="text-3xl font-bold mb-12 text-center text-gold">Koleksi Produk Terbaru</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="productGrid">
+            <!-- Product Cards injected by JS -->
+        </div>
+    </section>
+
+    <section id="faq" class="py-20 bg-neutral-50 dark:bg-neutral-900 transition-colors">
+        <div class="max-w-3xl mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-10 text-center text-gold">Pertanyaan Umum (FAQ)</h2>
+            <div class="space-y-4">
+                <div class="border border-neutral-200 dark:border-neutral-800 rounded-lg p-4">
+                    <button class="w-full text-left font-bold" onclick="this.nextElementSibling.classList.toggle('hidden')">Bagaimana cara melacak pesanan saya?</button>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2 hidden text-sm">Anda akan menerima email berisi nomor resi pengiriman segera setelah pesanan Anda diproses.</p>
+                </div>
+                <div class="border border-neutral-200 dark:border-neutral-800 rounded-lg p-4">
+                    <button class="w-full text-left font-bold" onclick="this.nextElementSibling.classList.toggle('hidden')">Apakah produk di TIFA asli?</button>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2 hidden text-sm">Ya, semua produk yang kami jual dijamin 100% original dan memiliki garansi resmi.</p>
+                </div>
+                <div class="border border-neutral-200 dark:border-neutral-800 rounded-lg p-4">
+                    <button class="w-full text-left font-bold" onclick="this.nextElementSibling.classList.toggle('hidden')">Bagaimana jika barang yang diterima rusak?</button>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2 hidden text-sm">Jangan khawatir, kami menyediakan garansi retur 1x24 jam setelah barang diterima dengan melampirkan video unboxing.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="kontak" class="py-20 max-w-6xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold mb-10 text-gold">Hubungi Kami</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="glass p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+                <p class="text-2xl mb-2">📧</p>
+                <h4 class="font-bold">Email</h4>
+                <p class="text-gray-600 dark:text-gray-400 text-sm">info@tifa-store.com</p>
+            </div>
+            <div class="glass p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+                <p class="text-2xl mb-2">📱</p>
+                <h4 class="font-bold">Telepon</h4>
+                <p class="font-bold text-gray-600 dark:text-gray-400 text-sm">+62 812-3456-7890</p>
+            </div>
+            <div class="glass p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+                <p class="text-2xl mb-2">👥</p>
+                <h4 class="font-bold">Facebook</h4>
+                <p class="text-gray-600 dark:text-gray-400 text-sm">@TifaElegant</p>
+            </div>
+            <div class="glass p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+                <p class="text-2xl mb-2">📸</p>
+                <h4 class="font-bold">Instagram</h4>
+                <p class="text-gray-600 dark:text-gray-400 text-sm">@TifaElegant_Official</p>
+            </div>
+        </div>
+    </section>
+
+    <div id="cartModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-neutral-900 p-8 rounded-2xl w-full max-w-lg border border-neutral-200 dark:border-neutral-800 max-h-[80vh] overflow-y-auto">
+            <h2 id="modalTitle" class="text-2xl font-bold mb-6 text-gold">Keranjang Anda</h2>
+            <div id="cartContent">
+                <div id="cartItems" class="space-y-4 mb-6">
+                    <p class="text-gray-500 text-center">Keranjang Kosong.</p>
+                </div>
+                <div id="cartActions" class="hidden space-y-4">
+                    <button onclick="showCheckout()" class="w-full bg-gold text-white py-3 rounded-lg font-bold">Lanjut ke Checkout</button>
+                    <button onclick="clearCart()" class="w-full text-red-500 text-sm hover:underline">Hapus Riwayat Pembelian</button>
+                </div>
+            </div>
+
+            <div id="checkoutForm" class="hidden space-y-4">
+                <h3 class="text-lg font-bold text-gold">Detail Pengiriman</h3>
+                <input type="text" id="name" placeholder="Nama Penerima" class="w-full bg-neutral-100 dark:bg-black border border-neutral-300 dark:border-neutral-700 p-2 rounded text-neutral-900 dark:text-white">
+                <textarea id="address" placeholder="Alamat Lengkap" class="w-full bg-neutral-100 dark:bg-black border border-neutral-300 dark:border-neutral-700 p-2 rounded text-neutral-900 dark:text-white"></textarea>
+                <input type="number" id="postal" placeholder="Kode Pos" class="w-full bg-neutral-100 dark:bg-black border border-neutral-300 dark:border-neutral-700 p-2 rounded text-neutral-900 dark:text-white">
+                
+                <select id="payment" onchange="updatePaymentDetails()" class="w-full bg-neutral-100 dark:bg-black border border-neutral-300 dark:border-neutral-700 p-2 rounded text-neutral-900 dark:text-white">
+                    <option disabled selected>Pilih Metode Pembayaran</option>
+                    <optgroup label="Transfer Bank">
+                        <option value="BCA">Bank BCA</option>
+                        <option value="Mandiri">Bank Mandiri</option>
+                        <option value="BRI">Bank BRI</option>
+                        <option value="BNI">Bank BNI</option>
+                    </optgroup>
+                    <optgroup label="E-Wallet">
+                        <option value="GoPay">GoPay</option>
+                        <option value="OVO">OVO</option>
+                        <option value="Dana">Dana</option>
+                    </optgroup>
+                </select>
+                
+                <div id="paymentDetails" class="hidden mt-3 p-3 bg-neutral-100 dark:bg-neutral-800 rounded text-sm text-gold"></div>
+
+                <div class="mt-2">
+                    <label class="text-sm text-gray-500 dark:text-gray-400">Bukti Pembayaran:</label>
+                    <input type="file" class="w-full text-sm text-gray-500 mt-1">
+                </div>
+                <button onclick="processOrder()" class="w-full bg-gold text-white py-3 rounded-lg font-bold mt-4">Selesaikan Pembayaran</button>
+                <button onclick="hideCheckout()" class="w-full text-gray-500 mt-2 text-sm">Kembali</button>
+            </div>
+            
+            <div id="successMessage" class="hidden flex-col items-center justify-center space-y-4 py-6 text-center">
+                <div class="w-24 h-24 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center text-5xl mb-4">
+                    ✓
+                </div>
+                <h3 class="text-2xl font-bold text-neutral-900 dark:text-white">Pembayaran Berhasil!</h3>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Terima kasih telah berbelanja di TIFA. Pesanan Anda telah kami terima.</p>
+                <button onclick="closeSuccess()" class="w-full bg-gold text-white py-3 rounded-lg font-bold mt-6 hover:scale-105 transition">Selesai & Tutup</button>
+            </div>
+
+            <button id="closeModalBtn" onclick="toggleCart()" class="w-full mt-4 text-gray-500 text-sm">Tutup</button>
+        </div>
+    </div>
+
+    <div id="loginModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-neutral-900 p-8 rounded-2xl w-full max-w-sm border border-neutral-200 dark:border-neutral-800 text-center">
+            <h2 class="text-2xl font-bold mb-6 text-gold">Login Pelanggan</h2>
+            <input type="text" id="username" placeholder="Username" class="w-full bg-neutral-100 dark:bg-black border border-neutral-300 dark:border-neutral-700 p-3 rounded mb-4 text-neutral-900 dark:text-white">
+            <button onclick="handleLogin()" class="w-full bg-gold text-white py-3 rounded-lg font-bold">Masuk</button>
+            <button onclick="toggleLogin()" class="w-full text-gray-500 mt-4">Batal</button>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle Function
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        const products = [
+            { name: "Smartwatch Sport", price: 2200000, img: "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=400&q=80" },
+            { name: "Wireless Headphone", price: 1500000, img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80" },
+            { name: "Classic Watch", price: 3500000, img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80" },
+            { name: "Premium Sunglasses", price: 850000, img: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=400&q=80" },
+            { name: "Leather Wallet", price: 450000, img: "https://images.unsplash.com/photo-1627123424574-724758594693?auto=format&fit=crop&w=400&q=80" },
+            { name: "Modern Backpack", price: 950000, img: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=400&q=80" },
+            { name: "Bluetooth Speaker", price: 1200000, img: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=400&q=80" },
+            { name: "Pro Gaming Mouse", price: 1100000, img: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=400&q=80" },
+            { name: "Mechanical Keyboard", price: 2100000, img: "https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=400&q=80" },
+            { name: "Smartphone Flagship", price: 14500000, img: "https://images.unsplash.com/photo-1598327105666-5b893514937e?auto=format&fit=crop&w=400&q=80" },
+            { name: "Wireless Charger Pad", price: 450000, img: "https://images.unsplash.com/photo-1617180183313-0590a2b53f65?auto=format&fit=crop&w=400&q=80" },
+            { name: "Laptop Stand", price: 650000, img: "https://images.unsplash.com/photo-1527443224154-c4a3942d3a35?auto=format&fit=crop&w=400&q=80" },
+            { name: "Designer Leather Bag", price: 3200000, img: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=400&q=80" },
+            { name: "Premium Running Shoes", price: 2800000, img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80" },
+            { name: "Pro DSLR Camera", price: 18500000, img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=400&q=80" },
+            { name: "Luxury Eau de Parfum", price: 1950000, img: "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=400&q=80" },
+            { name: "Gold Plated Cufflinks", price: 950000, img: "https://images.unsplash.com/photo-1611085583191-a36140d0e08f?auto=format&fit=crop&w=400&q=80" },
+            { name: "Smart Home Hub", price: 2400000, img: "https://images.unsplash.com/photo-1558002030-994348606c4b?auto=format&fit=crop&w=400&q=80" }
+        ];
+
+        const bankData = {
+            "BCA": "123-456-7890 (A/N: TIFA STORE)",
+            "Mandiri": "987-654-3210 (A/N: TIFA STORE)",
+            "BRI": "1122-3344-5566 (A/N: TIFA STORE)",
+            "BNI": "5566-7788-9900 (A/N: TIFA STORE)",
+            "GoPay": "0812-3456-7890 (A/N: TIFA STORE)",
+            "OVO": "0812-3456-7890 (A/N: TIFA STORE)",
+            "Dana": "0812-3456-7890 (A/N: TIFA STORE)"
+        };
+
+        function updatePaymentDetails() {
+            const method = document.getElementById('payment').value;
+            const details = document.getElementById('paymentDetails');
+            if (bankData[method]) {
+                details.innerHTML = `<strong>Nomor Rekening Tujuan (${method}):</strong><br>${bankData[method]}`;
+                details.classList.remove('hidden');
+            } else {
+                details.classList.add('hidden');
+            }
+        }
+
+        let cart = [];
+        const grid = document.getElementById('productGrid');
+        
+        products.forEach(p => {
+            grid.innerHTML += `
+                <div class="bg-white dark:bg-neutral-900 p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 transition-colors">
+                    <img src="${p.img}" class="w-full h-48 object-cover rounded-lg mb-4">
+                    <h3 class="text-xl font-bold">${p.name}</h3>
+                    <p class="text-gold font-semibold my-2">Rp ${p.price.toLocaleString()}</p>
+                    <button onclick="addToCart('${p.name}', ${p.price})" class="w-full bg-gold text-white py-2 rounded font-bold hover:opacity-90 transition">Tambah ke Keranjang</button>
+                </div>
+            `;
+        });
+
+        function toggleCart() { document.getElementById('cartModal').classList.toggle('hidden'); }
+        function toggleLogin() { document.getElementById('loginModal').classList.toggle('hidden'); }
+        
+        function handleLogin() {
+            const user = document.getElementById('username').value;
+            if(user) {
+                document.getElementById('authArea').innerHTML = `
+                    <span class="text-gold mr-4">Halo, ${user}!</span>
+                    <button onclick="handleLogout()" class="border border-red-500 px-2 py-0.5 rounded text-red-500 text-xs hover:bg-red-500 hover:text-white transition">Logout</button>
+                `;
+                toggleLogin();
+            }
+        }
+
+        function handleLogout() {
+            document.getElementById('authArea').innerHTML = `
+                <button id="loginBtn" onclick="toggleLogin()" class="text-gray-500 dark:text-gray-400 hover:text-gold transition">Login</button>
+            `;
+        }
+
+        function addToCart(name, price) {
+            cart.push({name, price});
+            document.getElementById('cartCount').innerText = cart.length;
+            renderCart();
+        }
+
+        function clearCart() {
+            cart = [];
+            document.getElementById('cartCount').innerText = 0;
+            renderCart();
+        }
+
+        function showCheckout() {
+            document.getElementById('modalTitle').innerText = "Detail Pengiriman";
+            document.getElementById('cartContent').classList.add('hidden');
+            document.getElementById('checkoutForm').classList.remove('hidden');
+        }
+
+        function hideCheckout() {
+            document.getElementById('modalTitle').innerText = "Keranjang Anda";
+            document.getElementById('cartContent').classList.remove('hidden');
+            document.getElementById('checkoutForm').classList.add('hidden');
+        }
+
+        function processOrder() {
+            clearCart();
+            document.getElementById('modalTitle').classList.add('hidden');
+            document.getElementById('checkoutForm').classList.add('hidden');
+            document.getElementById('closeModalBtn').classList.add('hidden');
+            
+            const successMsg = document.getElementById('successMessage');
+            successMsg.classList.remove('hidden');
+            successMsg.classList.add('flex');
+        }
+
+        function closeSuccess() {
+            document.getElementById('successMessage').classList.add('hidden');
+            document.getElementById('successMessage').classList.remove('flex');
+            
+            document.getElementById('modalTitle').classList.remove('hidden');
+            document.getElementById('closeModalBtn').classList.remove('hidden');
+            
+            hideCheckout();
+            toggleCart();
+        }
+
+        function renderCart() {
+            const items = document.getElementById('cartItems');
+            const actions = document.getElementById('cartActions');
+            
+            if (cart.length === 0) {
+                items.innerHTML = '<p class="text-gray-500 text-center">Keranjang Kosong.</p>';
+                actions.classList.add('hidden');
+            } else {
+                items.innerHTML = cart.map(item => `
+                    <div class="flex justify-between items-center bg-neutral-100 dark:bg-black p-3 rounded border border-neutral-200 dark:border-neutral-800">
+                        <div><p class="font-bold">${item.name}</p><p class="text-gold">Rp ${item.price.toLocaleString()}</p></div>
+                    </div>
+                `).join('');
+                actions.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
