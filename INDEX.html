@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NusaGrowth — Agensi Digital Marketing Berbasis Data & Konversi</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Konfigurasi Tailwind CSS: Mengaktifkan Dark Mode berbasis Class & Font Inter -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+
+    <!-- Skrip Inisialisasi Tema Awal (Mencegah Kedipan Tema / FOUC saat Halaman Dimuat) -->
+    <script>
+        (function () {
+            try {
+                const savedTheme = localStorage.getItem('nusagrowth-theme');
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch (e) {
+                // Abaikan jika akses localStorage dibatasi oleh iframe
+            }
+        })();
+    </script>
+</head>
+<body class="font-sans antialiased bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 overflow-x-hidden transition-colors duration-300 selection:bg-indigo-600 selection:text-white">
+
+    <!-- ==================== TOAST NOTIFICATION (Pengganti alert) ==================== -->
+    <div id="toast-container" class="fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-5 sm:right-5 z-50 flex flex-col gap-3 pointer-events-none sm:max-w-sm w-auto"></div>
+
+    <!-- ==================== HEADER / NAVBAR RESPONSIF ==================== -->
+    <header class="sticky top-0 z-40 w-full bg-white/85 dark:bg-slate-950/85 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+                <!-- Logo Brand -->
+                <a href="#" class="flex items-center gap-2.5 group focus:outline-none shrink-0">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">Nusa<span class="text-indigo-600 dark:text-indigo-400">Growth</span></span>
+                        <span class="block text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 -mt-1">Digital Agency</span>
+                    </div>
+                </a>
+
+                <!-- Navigasi Desktop -->
+                <nav class="hidden lg:flex items-center gap-7 xl:gap-8" aria-label="Navigasi Utama">
+                    <a href="#layanan" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Layanan</a>
+                    <a href="#kalkulator" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Simulasi ROI</a>
+                    <a href="#portofolio" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Studi Kasus</a>
+                    <a href="#harga" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Paket Harga</a>
+                    <a href="#faq" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">FAQ</a>
+                </nav>
+
+                <!-- Aksi Kanan: Toggle Tema Gelap/Terang + CTA + Menu Mobile -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <!-- Tombol Pengalih Mode Gelap / Terang (Tersedia di Mobile & Desktop) -->
+                    <button id="theme-toggle-btn" type="button" aria-label="Ubah tampilan gelap atau terang" title="Ganti Mode Gelap / Terang" class="inline-flex items-center justify-center gap-2 p-2.5 sm:px-3.5 sm:py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-300 border border-slate-200/80 dark:border-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <!-- Ikon Matahari (Tampil saat Dark Mode aktif -> klik untuk ke Light Mode) -->
+                        <svg id="theme-icon-sun" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <!-- Ikon Bulan (Tampil saat Light Mode aktif -> klik untuk ke Dark Mode) -->
+                        <svg id="theme-icon-moon" class="w-5 h-5 block dark:hidden text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                        <span id="theme-label-text" class="hidden sm:inline text-xs font-semibold text-slate-700 dark:text-slate-200">Gelap</span>
+                    </button>
+
+                    <!-- Tombol CTA Desktop -->
+                    <a href="#konsultasi" class="hidden lg:inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 rounded-xl shadow-sm shadow-indigo-600/25 transition-all hover:-translate-y-0.5">
+                        Audit Bisnis Gratis
+                        <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                    </a>
+
+                    <!-- Tombol Menu Mobile -->
+                    <button id="mobile-menu-btn" type="button" aria-label="Buka Menu Navigasi" aria-expanded="false" class="lg:hidden inline-flex items-center justify-center p-2.5 rounded-xl text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-colors">
+                        <svg id="menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dropdown Menu Mobile -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-xl transition-colors duration-300">
+            <div class="px-4 pt-3 pb-6 space-y-1.5">
+                <a href="#layanan" class="mobile-nav-link block px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Layanan</a>
+                <a href="#kalkulator" class="mobile-nav-link block px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Simulasi ROI</a>
+                <a href="#portofolio" class="mobile-nav-link block px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Studi Kasus</a>
+                <a href="#harga" class="mobile-nav-link block px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Paket Harga</a>
+                <a href="#faq" class="mobile-nav-link block px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">FAQ</a>
+                <div class="pt-3">
+                    <a href="#konsultasi" class="mobile-nav-link flex items-center justify-center w-full px-5 py-3.5 text-base font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md">
+                        Konsultasi & Audit Gratis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="relative overflow-hidden bg-gradient-to-b from-white via-indigo-50/40 to-slate-50 dark:from-slate-950 dark:via-indigo-950/25 dark:to-slate-950 pt-10 pb-16 sm:pt-16 sm:pb-20 lg:pt-24 lg:pb-28 transition-colors duration-300">
+        <!-- Dekorasi Cahaya Latar Belakang -->
+        <div class="pointer-events-none absolute -top-24 -right-24 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-indigo-200/40 dark:bg-indigo-600/15 blur-3xl"></div>
+        <div class="pointer-events-none absolute top-1/2 -left-24 w-64 sm:w-80 h-64 sm:h-80 rounded-full bg-blue-200/30 dark:bg-blue-600/10 blur-3xl"></div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-10 items-center">
+                
+                <!-- Kolom Kiri: Copywriting Utama -->
+                <div class="lg:col-span-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-100/80 dark:bg-indigo-500/15 border border-indigo-200 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300 text-xs sm:text-sm font-semibold mb-5 sm:mb-6">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Official Meta & Google Premier Partner
+                    </div>
+
+                    <h1 class="text-3xl sm:text-5xl lg:text-[3.35rem] font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.15] mb-5 sm:mb-6">
+                        Ubah Budget Iklan Menjadi <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500 dark:from-indigo-400 dark:to-cyan-400">Pertumbuhan Omzet</span> yang Terukur.
+                    </h1>
+
+                    <p class="text-sm sm:text-base lg:text-lg text-slate-600 dark:text-slate-300 leading-relaxed mb-7 sm:mb-8 max-w-2xl mx-auto lg:mx-0">
+                        Kami membantu UMKM berkembang hingga brand nasional mendominasi pasar digital melalui strategi <strong class="text-slate-900 dark:text-white">Performance Ads, SEO, dan Konten Kreatif</strong> yang 100% berbasis data—bukan sekadar tebakan.
+                    </p>
+
+                    <!-- Tombol Aksi Responsif -->
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3.5 sm:gap-4 mb-9 sm:mb-10">
+                        <a href="#konsultasi" class="inline-flex items-center justify-center px-6 sm:px-7 py-3.5 sm:py-4 text-sm sm:text-base font-semibold text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-600/25 transition-all hover:-translate-y-0.5">
+                            Jadwalkan Audit Gratis
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </a>
+                        <a href="#kalkulator" class="inline-flex items-center justify-center px-6 sm:px-7 py-3.5 sm:py-4 text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm transition-all">
+                            <svg class="w-5 h-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            Hitung Estimasi ROI
+                        </a>
+                    </div>
+
+                    <!-- Mini Social Proof -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 sm:gap-4 text-sm text-slate-500 dark:text-slate-400">
+                        <div class="flex -space-x-2.5">
+                            <img src="https://placehold.co/40x40/4f46e5/ffffff?text=AR" onerror="this.onerror=null;this.src='https://placehold.co/40x40/cbd5e1/475569?text=U1';" alt="Klien 1" class="w-9 h-9 rounded-full border-2 border-white dark:border-slate-900 object-cover">
+                            <img src="https://placehold.co/40x40/0ea5e9/ffffff?text=DS" onerror="this.onerror=null;this.src='https://placehold.co/40x40/cbd5e1/475569?text=U2';" alt="Klien 2" class="w-9 h-9 rounded-full border-2 border-white dark:border-slate-900 object-cover">
+                            <img src="https://placehold.co/40x40/10b981/ffffff?text=BW" onerror="this.onerror=null;this.src='https://placehold.co/40x40/cbd5e1/475569?text=U3';" alt="Klien 3" class="w-9 h-9 rounded-full border-2 border-white dark:border-slate-900 object-cover">
+                            <img src="https://placehold.co/40x40/f59e0b/ffffff?text=NP" onerror="this.onerror=null;this.src='https://placehold.co/40x40/cbd5e1/475569?text=U4';" alt="Klien 4" class="w-9 h-9 rounded-full border-2 border-white dark:border-slate-900 object-cover">
+                        </div>
+                        <div class="text-center sm:text-left">
+                            <div class="flex items-center justify-center sm:justify-start text-amber-400">
+                                <span>★★★★★</span>
+                                <span class="ml-1.5 font-bold text-slate-800 dark:text-slate-100">4.9/5</span>
+                            </div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Dipercaya oleh <strong class="text-slate-700 dark:text-slate-200">180+ Brand</strong> di seluruh Indonesia</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kolom Kanan: Visual Dashboard Performa Interaktif -->
+                <div class="lg:col-span-6 w-full max-w-xl mx-auto lg:max-w-none">
+                    <div class="relative bg-slate-900 dark:bg-slate-900/90 rounded-3xl p-5 sm:p-8 shadow-2xl border border-slate-800 dark:border-slate-700/80 text-white">
+                        <!-- Header Dashboard Mockup -->
+                        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4 sm:pb-5 mb-5 sm:mb-6">
+                            <div>
+                                <span class="text-[11px] sm:text-xs font-medium text-slate-400 uppercase tracking-wider">Live Client Performance</span>
+                                <h3 class="text-base sm:text-lg font-bold text-white mt-0.5">Dashboard Konversi Q4</h3>
+                            </div>
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-semibold border border-emerald-500/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                                Scaling Aktif
+                            </span>
+                        </div>
+
+                        <!-- Metrik Utama -->
+                        <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-5 sm:mb-6">
+                            <div class="bg-slate-800/70 rounded-2xl p-3.5 sm:p-4 border border-slate-700/60">
+                                <p class="text-[11px] sm:text-xs text-slate-400 mb-1">Rata-rata ROAS</p>
+                                <div class="flex flex-wrap items-baseline gap-1.5 sm:gap-2">
+                                    <span class="text-xl sm:text-3xl font-extrabold text-white">6.4x</span>
+                                    <span class="text-[11px] sm:text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-lg">+42%</span>
+                                </div>
+                            </div>
+                            <div class="bg-slate-800/70 rounded-2xl p-3.5 sm:p-4 border border-slate-700/60">
+                                <p class="text-[11px] sm:text-xs text-slate-400 mb-1">Leads Bulan Ini</p>
+                                <div class="flex flex-wrap items-baseline gap-1.5 sm:gap-2">
+                                    <span class="text-xl sm:text-3xl font-extrabold text-white">4,820</span>
+                                    <span class="text-[11px] sm:text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-lg">+118%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Grafik Batang Visual Pertumbuhan -->
+                        <div class="bg-slate-800/50 rounded-2xl p-4 sm:p-5 border border-slate-700/50 mb-5">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                                <span class="text-xs font-semibold text-slate-300">Pertumbuhan Omzet (6 Bln)</span>
+                                <span class="text-xs font-bold text-indigo-400">Rp 1,84 Miliar</span>
+                            </div>
+                            <div class="grid grid-cols-6 gap-2 sm:gap-3 items-end h-28 sm:h-32 pt-2">
+                                <div class="flex flex-col items-center gap-1.5 h-full justify-end">
+                                    <div class="w-full bg-indigo-500/30 rounded-t-lg h-[30%] hover:bg-indigo-500/60 transition-colors"></div>
+                                    <span class="text-[10px] text-slate-400">B1</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1.5 h-full justify-end">
+                                    <div class="w-full bg-indigo-500/45 rounded-t-lg h-[45%] hover:bg-indigo-500/70 transition-colors"></div>
+                                    <span class="text-[10px] text-slate-400">B2</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1.5 h-full justify-end">
+                                    <div class="w-full bg-indigo-500/60 rounded-t-lg h-[58%] hover:bg-indigo-500/80 transition-colors"></div>
+                                    <span class="text-[10px] text-slate-400">B3</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1.5 h-full justify-end">
+                                    <div class="w-full bg-indigo-500/75 rounded-t-lg h-[72%] hover:bg-indigo-500/90 transition-colors"></div>
+                                    <span class="text-[10px] text-slate-400">B4</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1.5 h-full justify-end">
+                                    <div class="w-full bg-blue-500/85 rounded-t-lg h-[85%] hover:bg-blue-400 transition-colors"></div>
+                                    <span class="text-[10px] text-slate-400">B5</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1.5 h-full justify-end">
+                                    <div class="w-full bg-gradient-to-t from-indigo-600 to-emerald-400 rounded-t-lg h-full shadow-lg shadow-emerald-500/20"></div>
+                                    <span class="text-[10px] font-bold text-emerald-400">B6</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Channel Breakdown -->
+                        <div class="flex flex-wrap items-center justify-center sm:justify-between gap-2 text-[11px] sm:text-xs text-slate-300 pt-1">
+                            <span class="inline-flex items-center gap-1.5 bg-slate-800 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-700">
+                                <span class="w-2 h-2 rounded-full bg-blue-400"></span> Meta Ads: 48%
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 bg-slate-800 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-700">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Google SEO: 32%
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 bg-slate-800 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-700">
+                                <span class="w-2 h-2 rounded-full bg-pink-400"></span> TikTok Ads: 20%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== METRICS / TRUST BAR ==================== -->
+    <section class="bg-slate-900 dark:bg-slate-900/70 py-10 sm:py-12 border-y border-slate-800 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 text-center">
+                <div class="p-2">
+                    <p class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">Rp 65M+</p>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">Total Ad Spend Dikelola</p>
+                </div>
+                <div class="p-2">
+                    <p class="text-2xl sm:text-4xl font-extrabold text-indigo-400 tracking-tight">4.8x</p>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">Rata-rata ROAS Klien</p>
+                </div>
+                <div class="p-2">
+                    <p class="text-2xl sm:text-4xl font-extrabold text-emerald-400 tracking-tight">180+</p>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">Brand & UMKM Bertumbuh</p>
+                </div>
+                <div class="p-2">
+                    <p class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">96%</p>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">Tingkat Retensi Klien</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== LAYANAN KAMI (SERVICES) ==================== -->
+    <section id="layanan" class="py-16 sm:py-20 lg:py-28 bg-white dark:bg-slate-950 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+                <span class="inline-block px-3.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 text-xs font-bold uppercase tracking-wider mb-3">Solusi End-to-End</span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
+                    Layanan Digital Marketing yang Fokus pada <span class="text-indigo-600 dark:text-indigo-400">Profit Nyata</span>
+                </h2>
+                <p class="text-sm sm:text-base lg:text-lg text-slate-600 dark:text-slate-400">
+                    Setiap kanal memiliki peran spesifik dalam customer journey. Kami mengintegrasikan seluruh strategi agar biaya akuisisi lebih hemat dan konversi maksimal.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
+                <!-- Layanan 1 -->
+                <div class="group bg-slate-50 dark:bg-slate-900/70 hover:bg-white dark:hover:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center mb-5 sm:mb-6 shadow-md shadow-indigo-600/20 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2.5 sm:mb-3">Performance Ads (Paid Media)</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-5">
+                        Pengelolaan iklan Meta Ads (IG/FB), TikTok Ads, dan Google Ads dengan optimasi harian, A/B testing kreatif, dan retargeting presisi.
+                    </p>
+                    <ul class="space-y-2 text-xs font-medium text-slate-700 dark:text-slate-300">
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Riset Audiens & Funnel Full-Stack</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Setup Pixel & Conversion API (CAPI)</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Scaling Budget Terukur & Aman</li>
+                    </ul>
+                </div>
+
+                <!-- Layanan 2 -->
+                <div class="group bg-slate-50 dark:bg-slate-900/70 hover:bg-white dark:hover:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center mb-5 sm:mb-6 shadow-md shadow-blue-600/20 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2.5 sm:mb-3">SEO & Content Marketing</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-5">
+                        Dominasi halaman pertama Google untuk kata kunci berdaya beli tinggi agar bisnis Anda mendapatkan trafik organik berkelanjutan.
+                    </p>
+                    <ul class="space-y-2 text-xs font-medium text-slate-700 dark:text-slate-300">
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Technical SEO & Audit Website</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Artikel SEO High-Intent & Copywriting</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Backlink Otoritas & Local SEO</li>
+                    </ul>
+                </div>
+
+                <!-- Layanan 3 -->
+                <div class="group bg-slate-50 dark:bg-slate-900/70 hover:bg-white dark:hover:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-pink-600 text-white flex items-center justify-center mb-5 sm:mb-6 shadow-md shadow-pink-600/20 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2.5 sm:mb-3">Social Media & Video Kreatif</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-5">
+                        Produksi konten Reels, TikTok, dan desain visual yang menghentikan scroll audiens sekaligus membangun kepercayaan brand.
+                    </p>
+                    <ul class="space-y-2 text-xs font-medium text-slate-700 dark:text-slate-300">
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Kalender Konten & Riset Tren</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Produksi Video UGC & Short-Form</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Manajemen Komunitas & Admin</li>
+                    </ul>
+                </div>
+
+                <!-- Layanan 4 -->
+                <div class="group bg-slate-50 dark:bg-slate-900/70 hover:bg-white dark:hover:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mb-5 sm:mb-6 shadow-md shadow-emerald-600/20 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2.5 sm:mb-3">Landing Page & CRO</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-5">
+                        Iklan bagus akan sia-sia jika website lambat. Kami merancang landing page cepat dengan struktur psikologi penjualan tinggi.
+                    </p>
+                    <ul class="space-y-2 text-xs font-medium text-slate-700 dark:text-slate-300">
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Copywriting Persuasif & Jelas</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Mobile-First & Loading Super Cepat</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Integrasi WhatsApp & CRM Otomatis</li>
+                    </ul>
+                </div>
+
+                <!-- Layanan 5 -->
+                <div class="group bg-slate-50 dark:bg-slate-900/70 hover:bg-white dark:hover:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center mb-5 sm:mb-6 shadow-md shadow-amber-500/20 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2.5 sm:mb-3">KOL & Influencer Campaign</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-5">
+                        Kurasi kreator dan micro-influencer yang tepat sasaran untuk meningkatkan awareness sekaligus mendorong penjualan di marketplace.
+                    </p>
+                    <ul class="space-y-2 text-xs font-medium text-slate-700 dark:text-slate-300">
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Seleksi KOL Berdasarkan Engagement Asli</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Brief Kreatif & Negosiasi Ratecard</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Tracking Performa Affiliate & Link</li>
+                    </ul>
+                </div>
+
+                <!-- Layanan 6 -->
+                <div class="group bg-slate-50 dark:bg-slate-900/70 hover:bg-white dark:hover:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-900 dark:bg-indigo-500 text-white flex items-center justify-center mb-5 sm:mb-6 shadow-md shadow-slate-900/20 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2.5 sm:mb-3">Data Analytics & Reporting</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-5">
+                        Transparansi penuh melalui dashboard real-time Looker Studio & GA4 sehingga Anda tahu persis ke mana setiap rupiah iklan bekerja.
+                    </p>
+                    <ul class="space-y-2 text-xs font-medium text-slate-700 dark:text-slate-300">
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Live Dashboard 24/7 (Looker Studio)</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Laporan Evaluasi Mingguan & Bulanan</li>
+                        <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Sesi Strategi Langsung dengan Lead</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== KALKULATOR ESTIMASI ROI INTERAKTIF ==================== -->
+    <section id="kalkulator" class="py-16 sm:py-20 lg:py-24 bg-slate-900 dark:bg-slate-900/60 text-white relative overflow-hidden border-y border-slate-800 transition-colors duration-300">
+        <div class="pointer-events-none absolute top-0 right-0 w-80 sm:w-96 h-80 sm:h-96 bg-indigo-600/20 rounded-full blur-3xl"></div>
+        <div class="pointer-events-none absolute bottom-0 left-0 w-80 sm:w-96 h-80 sm:h-96 bg-blue-600/15 rounded-full blur-3xl"></div>
+
+        <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
+                <span class="inline-block px-3.5 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-bold uppercase tracking-wider mb-3">Simulasi Interaktif</span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight mb-4">
+                    Hitung Potensi Pertumbuhan Bisnis Anda
+                </h2>
+                <p class="text-slate-400 text-sm sm:text-base">
+                    Geser estimasi budget iklan bulanan dan pilih industri Anda untuk melihat proyeksi performa berdasarkan rata-rata data klien NusaGrowth.
+                </p>
+            </div>
+
+            <div class="bg-slate-800/80 backdrop-blur-md border border-slate-700 rounded-3xl p-5 sm:p-8 lg:p-10 shadow-2xl">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+                    
+                    <!-- Input Kontrol -->
+                    <div class="lg:col-span-6 space-y-6 sm:space-y-7">
+                        <!-- Pilih Industri -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-200 mb-3">1. Pilih Industri Bisnis Anda</label>
+                            <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 gap-3" id="industry-selector">
+                                <button type="button" data-industry="ecommerce" class="industry-btn p-3.5 rounded-2xl text-left border-2 border-indigo-500 bg-indigo-600/20 text-white transition-all">
+                                    <span class="block text-sm font-bold">Fashion & Beauty</span>
+                                    <span class="block text-xs text-indigo-200">E-Commerce / D2C</span>
+                                </button>
+                                <button type="button" data-industry="fnb" class="industry-btn p-3.5 rounded-2xl text-left border border-slate-700 bg-slate-900/50 text-slate-300 hover:border-slate-500 transition-all">
+                                    <span class="block text-sm font-bold">Kuliner & F&B</span>
+                                    <span class="block text-xs text-slate-400">Resto / Produk Olahan</span>
+                                </button>
+                                <button type="button" data-industry="jasa" class="industry-btn p-3.5 rounded-2xl text-left border border-slate-700 bg-slate-900/50 text-slate-300 hover:border-slate-500 transition-all">
+                                    <span class="block text-sm font-bold">Jasa & Klinik</span>
+                                    <span class="block text-xs text-slate-400">Lead Generation WA</span>
+                                </button>
+                                <button type="button" data-industry="properti" class="industry-btn p-3.5 rounded-2xl text-left border border-slate-700 bg-slate-900/50 text-slate-300 hover:border-slate-500 transition-all">
+                                    <span class="block text-sm font-bold">Properti & B2B</span>
+                                    <span class="block text-xs text-slate-400">High-Ticket Sales</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Slider Budget Iklan -->
+                        <div>
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                <label for="budget-slider" class="text-sm font-semibold text-slate-200">2. Budget Iklan Bulanan</label>
+                                <span id="budget-display" class="text-base sm:text-lg font-extrabold text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-xl border border-indigo-500/20">Rp 25.000.000</span>
+                            </div>
+                            <input type="range" id="budget-slider" min="5000000" max="150000000" step="5000000" value="25000000" class="w-full h-3 bg-slate-700 rounded-full appearance-none cursor-pointer accent-indigo-500">
+                            <div class="flex justify-between text-xs text-slate-400 mt-2">
+                                <span>Rp 5 Juta</span>
+                                <span>Rp 75 Juta</span>
+                                <span>Rp 150 Juta</span>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-400 italic leading-relaxed">
+                            *Angka di samping merupakan estimasi konservatif berdasarkan benchmark historis kampanye kami (bukan jaminan mutlak, performa aktual bergantung pada produk & penawaran).
+                        </p>
+                    </div>
+
+                    <!-- Output Proyeksi -->
+                    <div class="lg:col-span-6">
+                        <div class="bg-slate-900 rounded-2xl p-5 sm:p-7 border border-slate-700/80 space-y-5">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-4">
+                                <span class="text-xs sm:text-sm font-medium text-slate-400">Estimasi Omzet Kotor / Bulan</span>
+                                <span id="roas-badge" class="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-bold border border-emerald-500/20">Est. ROAS 4.8x</span>
+                            </div>
+
+                            <div>
+                                <p id="est-revenue" class="text-2xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 tracking-tight break-words">
+                                    Rp 120.000.000
+                                </p>
+                                <p class="text-xs text-slate-400 mt-1">Potensi pendapatan kotor bulanan setelah fase optimasi (60-90 hari)</p>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3 sm:gap-4 pt-2">
+                                <div class="bg-slate-800/80 rounded-xl p-3.5 sm:p-4 border border-slate-700/50">
+                                    <p class="text-[11px] sm:text-xs text-slate-400 mb-1">Estimasi Jangkauan</p>
+                                    <p id="est-reach" class="text-lg sm:text-xl font-bold text-white">415.000+</p>
+                                    <p class="text-[11px] text-slate-400">Impresi tertarget</p>
+                                </div>
+                                <div class="bg-slate-800/80 rounded-xl p-3.5 sm:p-4 border border-slate-700/50">
+                                    <p class="text-[11px] sm:text-xs text-slate-400 mb-1">Estimasi Prospek</p>
+                                    <p id="est-leads" class="text-lg sm:text-xl font-bold text-white">1.250+</p>
+                                    <p class="text-[11px] text-slate-400">Leads / transaksi</p>
+                                </div>
+                            </div>
+
+                            <button type="button" id="apply-calc-btn" class="w-full py-3.5 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-all shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2">
+                                Diskusikan Strategi untuk Budget Ini
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== STUDI KASUS / PORTOFOLIO ==================== -->
+    <section id="portofolio" class="py-16 sm:py-20 lg:py-28 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 sm:mb-12">
+                <div class="max-w-2xl">
+                    <span class="inline-block px-3.5 py-1 rounded-full bg-indigo-100 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 text-xs font-bold uppercase tracking-wider mb-3">Hasil Nyata</span>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                        Studi Kasus Klien Kami
+                    </h2>
+                    <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-2">
+                        Bukti konkret bagaimana strategi kami membantu bisnis dari berbagai industri melesat.
+                    </p>
+                </div>
+
+                <!-- Filter Kategori Responsif -->
+                <div class="flex flex-wrap gap-2" id="portfolio-filters">
+                    <button type="button" data-filter="all" class="filter-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-indigo-600 text-white shadow-sm transition-all">Semua</button>
+                    <button type="button" data-filter="ecommerce" class="filter-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">E-Commerce</button>
+                    <button type="button" data-filter="fnb" class="filter-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">F&B</button>
+                    <button type="button" data-filter="jasa" class="filter-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">Klinik & Properti</button>
+                </div>
+            </div>
+
+            <!-- Grid Kartu Studi Kasus -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8" id="portfolio-grid">
+                
+                <!-- Case Study 1 -->
+                <article class="case-card bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all flex flex-col" data-category="ecommerce">
+                    <div class="relative h-48 sm:h-52 overflow-hidden bg-slate-900">
+                        <img src="https://placehold.co/600x400/312e81/e0e7ff?text=Kala+Skincare+Brand" onerror="this.onerror=null;this.src='https://placehold.co/600x400/1e293b/ffffff?text=Case+Study+1';" alt="Kala Skincare" class="w-full h-full object-cover">
+                        <span class="absolute top-4 left-4 px-3 py-1 rounded-full bg-white/95 dark:bg-slate-900/90 text-indigo-700 dark:text-indigo-300 text-xs font-bold shadow-sm">E-Commerce • Beauty</span>
+                    </div>
+                    <div class="p-5 sm:p-6 flex-1 flex flex-col">
+                        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2">Kala Botanical Skincare</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-5 flex-1">
+                            Restrukturisasi Meta & TikTok Ads plus produksi 24 konten video UGC per bulan untuk menekan biaya akuisisi pelanggan.
+                        </p>
+                        <div class="grid grid-cols-2 gap-3 p-3.5 bg-slate-50 dark:bg-slate-800/70 rounded-2xl border border-slate-100 dark:border-slate-700/60 mb-5">
+                            <div>
+                                <span class="block text-xs text-slate-500 dark:text-slate-400">Kenaikan Omzet</span>
+                                <span class="text-lg font-extrabold text-emerald-600 dark:text-emerald-400">+320%</span>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-slate-500 dark:text-slate-400">Rata-rata ROAS</span>
+                                <span class="text-lg font-extrabold text-indigo-600 dark:text-indigo-400">6.8x</span>
+                            </div>
+                        </div>
+                        <button type="button" onclick="openCaseModal('kala')" class="w-full py-3 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 dark:hover:bg-indigo-600 text-slate-700 dark:text-slate-200 hover:text-white font-semibold text-sm transition-colors">
+                            Baca Detail Strategi →
+                        </button>
+                    </div>
+                </article>
+
+                <!-- Case Study 2 -->
+                <article class="case-card bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all flex flex-col" data-category="fnb">
+                    <div class="relative h-48 sm:h-52 overflow-hidden bg-slate-900">
+                        <img src="https://placehold.co/600x400/0f766e/ccfbf1?text=Kopi+Senja+Roastery" onerror="this.onerror=null;this.src='https://placehold.co/600x400/1e293b/ffffff?text=Case+Study+2';" alt="Kopi Senja" class="w-full h-full object-cover">
+                        <span class="absolute top-4 left-4 px-3 py-1 rounded-full bg-white/95 dark:bg-slate-900/90 text-emerald-700 dark:text-emerald-300 text-xs font-bold shadow-sm">F&B • 12 Outlet</span>
+                    </div>
+                    <div class="p-5 sm:p-6 flex-1 flex flex-col">
+                        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2">Kopi Senja & Roastery</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-5 flex-1">
+                            Kampanye hyper-local ads radius 5km di sekitar outlet dan aktivasi 35 micro-influencer kuliner lokal.
+                        </p>
+                        <div class="grid grid-cols-2 gap-3 p-3.5 bg-slate-50 dark:bg-slate-800/70 rounded-2xl border border-slate-100 dark:border-slate-700/60 mb-5">
+                            <div>
+                                <span class="block text-xs text-slate-500 dark:text-slate-400">Kunjungan Outlet</span>
+                                <span class="text-lg font-extrabold text-emerald-600 dark:text-emerald-400">+185%</span>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-slate-500 dark:text-slate-400">Penjualan Online</span>
+                                <span class="text-lg font-extrabold text-indigo-600 dark:text-indigo-400">4.2x</span>
+                            </div>
+                        </div>
+                        <button type="button" onclick="openCaseModal('kopi')" class="w-full py-3 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 dark:hover:bg-indigo-600 text-slate-700 dark:text-slate-200 hover:text-white font-semibold text-sm transition-colors">
+                            Baca Detail Strategi →
+                        </button>
+                    </div>
+                </article>
+
+                <!-- Case Study 3 -->
+                <article class="case-card bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all flex flex-col" data-category="jasa">
+                    <div class="relative h-48 sm:h-52 overflow-hidden bg-slate-900">
+                        <img src="https://placehold.co/600x400/1d4ed8/dbeafe?text=Aurelia+Aesthetic+Clinic" onerror="this.onerror=null;this.src='https://placehold.co/600x400/1e293b/ffffff?text=Case+Study+3';" alt="Aurelia Clinic" class="w-full h-full object-cover">
+                        <span class="absolute top-4 left-4 px-3 py-1 rounded-full bg-white/95 dark:bg-slate-900/90 text-blue-700 dark:text-blue-300 text-xs font-bold shadow-sm">Klinik Kecantikan</span>
+                    </div>
+                    <div class="p-5 sm:p-6 flex-1 flex flex-col">
+                        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2">Aurelia Aesthetic Clinic</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-5 flex-1">
+                            Optimasi Google Search Ads, SEO lokal, serta pembuatan landing page reservasi cepat yang terintegrasi dengan WhatsApp.
+                        </p>
+                        <div class="grid grid-cols-2 gap-3 p-3.5 bg-slate-50 dark:bg-slate-800/70 rounded-2xl border border-slate-100 dark:border-slate-700/60 mb-5">
+                            <div>
+                                <span class="block text-xs text-slate-500 dark:text-slate-400">Cost Per Lead</span>
+                                <span class="text-lg font-extrabold text-emerald-600 dark:text-emerald-400">-54%</span>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-slate-500 dark:text-slate-400">Booking / Bulan</span>
+                                <span class="text-lg font-extrabold text-indigo-600 dark:text-indigo-400">640+</span>
+                            </div>
+                        </div>
+                        <button type="button" onclick="openCaseModal('aurelia')" class="w-full py-3 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 dark:hover:bg-indigo-600 text-slate-700 dark:text-slate-200 hover:text-white font-semibold text-sm transition-colors">
+                            Baca Detail Strategi →
+                        </button>
+                    </div>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PROSES KERJA (4 LANGKAH) ==================== -->
+    <section class="py-16 sm:py-20 bg-white dark:bg-slate-950 border-y border-slate-200/70 dark:border-slate-800/80 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+                <span class="inline-block px-3.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 text-xs font-bold uppercase tracking-wider mb-3">Metodologi Teruji</span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
+                    Bagaimana Kami Melipatgandakan Hasil Anda
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+                <div class="relative p-6 rounded-3xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800">
+                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-600 text-white font-extrabold text-sm mb-4">01</span>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Audit & Riset Pasar</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Analisis mendalam akun iklan lama, kompetitor, harga produk, serta celah konversi di funnel Anda.</p>
+                </div>
+                <div class="relative p-6 rounded-3xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800">
+                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-600 text-white font-extrabold text-sm mb-4">02</span>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Blueprint Strategi</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Penyusunan rencana media, sudut pandang kreatif (creative angle), dan target KPI yang disepakati bersama.</p>
+                </div>
+                <div class="relative p-6 rounded-3xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800">
+                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-600 text-white font-extrabold text-sm mb-4">03</span>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Eksekusi & Testing</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Peluncuran kampanye, pemantauan metrik harian, dan uji coba cepat untuk menemukan winning creative.</p>
+                </div>
+                <div class="relative p-6 rounded-3xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800">
+                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-600 text-white font-extrabold text-sm mb-4">04</span>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Scaling & Reporting</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Peningkatan skala budget pada kampanye profitabel disertai laporan transparan setiap minggu.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PAKET HARGA (PRICING) ==================== -->
+    <section id="harga" class="py-16 sm:py-20 lg:py-28 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-9 sm:mb-10">
+                <span class="inline-block px-3.5 py-1 rounded-full bg-indigo-100 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 text-xs font-bold uppercase tracking-wider mb-3">Investasi Transparan</span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
+                    Pilih Paket Sesuai Tahap Bisnis Anda
+                </h2>
+                <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400">
+                    Tanpa biaya tersembunyi. Budget iklan dibayarkan langsung ke platform (Meta/Google/TikTok) agar Anda memiliki kontrol penuh atas data akun.
+                </p>
+            </div>
+
+            <!-- Toggle Bulanan / Kuartalan -->
+            <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-12">
+                <span id="label-monthly" class="text-sm font-bold text-slate-900 dark:text-white transition-colors">Bayar Bulanan</span>
+                <button type="button" id="billing-toggle" aria-label="Ubah periode pembayaran" class="relative inline-flex h-8 w-16 items-center rounded-full bg-indigo-600 transition-colors p-1 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    <span id="billing-dot" class="inline-block h-6 w-6 transform rounded-full bg-white shadow-md transition-transform translate-x-0"></span>
+                </button>
+                <span id="label-quarterly" class="text-sm font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1.5 transition-colors">
+                    Per 3 Bulan
+                    <span class="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-bold">Hemat 15%</span>
+                </span>
+            </div>
+
+            <!-- Grid Kartu Harga -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-7 lg:gap-8 items-stretch">
+                
+                <!-- Paket Starter -->
+                <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Starter UMKM</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Cocok untuk bisnis yang baru mulai beriklan secara terstruktur.</p>
+                    </div>
+                    <div class="mb-6 pb-6 border-b border-slate-100 dark:border-slate-800">
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white price-value" data-monthly="Rp 4,5 jt" data-quarterly="Rp 3,8 jt">Rp 4,5 jt</span>
+                            <span class="text-sm text-slate-500 dark:text-slate-400">/ bulan</span>
+                        </div>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Rekomendasi Ad Spend: s/d Rp 15 jt/bln</p>
+                    </div>
+                    <ul class="space-y-3.5 text-sm text-slate-700 dark:text-slate-300 mb-8 flex-1">
+                        <li class="flex items-start gap-2.5"><span class="text-indigo-600 dark:text-indigo-400 font-bold">✓</span> Kelola 1 Platform Iklan (Meta atau TikTok)</li>
+                        <li class="flex items-start gap-2.5"><span class="text-indigo-600 dark:text-indigo-400 font-bold">✓</span> 8 Desain / Video Kreatif Iklan per Bulan</li>
+                        <li class="flex items-start gap-2.5"><span class="text-indigo-600 dark:text-indigo-400 font-bold">✓</span> Setup Pixel & Tracking Dasar</li>
+                        <li class="flex items-start gap-2.5"><span class="text-indigo-600 dark:text-indigo-400 font-bold">✓</span> Laporan Performa Dua Mingguan</li>
+                        <li class="flex items-start gap-2.5"><span class="text-indigo-600 dark:text-indigo-400 font-bold">✓</span> Grup Support WhatsApp Dedikasi</li>
+                    </ul>
+                    <button type="button" onclick="selectPackage('Starter UMKM (Rp 4,5 jt/bln)')" class="w-full py-3.5 px-5 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-semibold text-sm transition-colors">
+                        Pilih Paket Starter
+                    </button>
+                </div>
+
+                <!-- Paket Growth (Paling Populer) -->
+                <div class="relative bg-slate-900 dark:bg-gradient-to-b dark:from-indigo-950/80 dark:to-slate-900 text-white rounded-3xl p-6 sm:p-8 border-2 border-indigo-500 shadow-2xl shadow-indigo-600/15 flex flex-col lg:-translate-y-2">
+                    <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 text-white text-xs font-bold uppercase tracking-wider shadow-md whitespace-nowrap">
+                        Paling Populer
+                    </span>
+                    <div class="mb-6 pt-1">
+                        <h3 class="text-xl font-bold text-white">Growth Accelerator</h3>
+                        <p class="text-sm text-slate-400 mt-1">Untuk brand yang siap scaling omzet secara agresif di berbagai kanal.</p>
+                    </div>
+                    <div class="mb-6 pb-6 border-b border-slate-800">
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-3xl sm:text-4xl font-extrabold text-white price-value" data-monthly="Rp 9,5 jt" data-quarterly="Rp 8,1 jt">Rp 9,5 jt</span>
+                            <span class="text-sm text-slate-400">/ bulan</span>
+                        </div>
+                        <p class="text-xs text-indigo-300 mt-1">Rekomendasi Ad Spend: Rp 15 jt – 75 jt/bln</p>
+                    </div>
+                    <ul class="space-y-3.5 text-sm text-slate-200 mb-8 flex-1">
+                        <li class="flex items-start gap-2.5"><span class="text-emerald-400 font-bold">✓</span> Multi-Channel Ads (Meta + Google + TikTok)</li>
+                        <li class="flex items-start gap-2.5"><span class="text-emerald-400 font-bold">✓</span> 18 Konten Kreatif + Video UGC/Reels per Bulan</li>
+                        <li class="flex items-start gap-2.5"><span class="text-emerald-400 font-bold">✓</span> Gratis 1 Landing Page Konversi Tinggi</li>
+                        <li class="flex items-start gap-2.5"><span class="text-emerald-400 font-bold">✓</span> Setup Advanced GA4 & Server-Side CAPI</li>
+                        <li class="flex items-start gap-2.5"><span class="text-emerald-400 font-bold">✓</span> Live Dashboard 24/7 + Meeting Mingguan</li>
+                        <li class="flex items-start gap-2.5"><span class="text-emerald-400 font-bold">✓</span> Dedicated Senior Performance Marketer</li>
+                    </ul>
+                    <button type="button" onclick="selectPackage('Growth Accelerator (Rp 9,5 jt/bln)')" class="w-full py-3.5 px-5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-all shadow-lg shadow-indigo-600/30">
+                        Pilih Paket Growth
+                    </button>
+                </div>
+
+                <!-- Paket Enterprise -->
+                <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Scale & Enterprise</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Tim marketing eksternal lengkap (Full-Funnel) untuk korporasi & brand besar.</p>
+                    </div>
+                    <div class="mb-6 pb-6 border-b border-slate-100 dark:border-slate-800">
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white price-value" data-monthly="Rp 18 jt+" data-quarterly="Rp 15,3 jt+">Rp 18 jt+</span>
+                            <span class="text-sm text-slate-500 dark:text-slate-400">/ bulan</span>
+                        </div>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Ad Spend: Rp 75 jt – Rp 1 Miliar+/bln</p>
+                    </div>
+                    <ul class="space-y-3.5 text-sm text-slate-700 dark:text-slate-300 mb-8 flex-1">
+                        <li class="flex items-start gap-2.5"><span class="text-indigo-600 dark:text-indigo-400 font-bold">✓</span> Semua Fitur Paket Growth Accelerator</li>
+                        <li class="flex items-start gap-2.5"><span class="text-indigo-600 dark:text-indigo-400 font-bold">✓</span> Full SEO Website + 12 Artikel High-Intent/Bln</li>
+                        <li class="flex items-start gap-2.5"><span class="text-indigo-600 dark:text-indigo-400 font-bold">✓</span> Manajemen KOL & Influencer Campaign</li>
+                        <li class="flex items-start gap-2.5"><span class="text-indigo-600 dark:text-indigo-400 font-bold">✓</span> 35+ Aset Kreatif & A/B Testing Berkelanjutan</li>
+                        <li class="flex items-start gap-2.5"><span class="text-indigo-600 dark:text-indigo-400 font-bold">✓</span> Email/WhatsApp CRM Automation & Retensi</li>
+                    </ul>
+                    <button type="button" onclick="selectPackage('Scale & Enterprise (Custom)')" class="w-full py-3.5 px-5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-semibold text-sm transition-colors">
+                        Minta Penawaran Custom
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TESTIMONI KLIEN ==================== -->
+    <section class="py-16 sm:py-20 bg-white dark:bg-slate-950 border-t border-slate-200/70 dark:border-slate-800/80 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-14">
+                <span class="inline-block px-3.5 py-1 rounded-full bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 text-xs font-bold uppercase tracking-wider mb-3">Kata Klien</span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                    Dipercaya Pemilik Bisnis & Marketing Leader
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+                <div class="bg-slate-50 dark:bg-slate-900/70 rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
+                    <div>
+                        <div class="text-amber-400 text-lg mb-4">★★★★★</div>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-6">
+                            "Sebelumnya kami sering boncos iklan karena hanya boost post. Setelah ditangani tim NusaGrowth, dalam 2 bulan ROAS stabil di atas 5x dan tim CS kami sampai kewalahan menerima orderan."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3.5 pt-4 border-t border-slate-200/70 dark:border-slate-800">
+                        <img src="https://placehold.co/48x48/4f46e5/ffffff?text=RP" onerror="this.onerror=null;this.src='https://placehold.co/48x48/cbd5e1/475569?text=RP';" alt="Rina Pratama" class="w-11 h-11 rounded-full object-cover">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-900 dark:text-white">Rina Pratama</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Founder, Kala Botanical</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-slate-900/70 rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
+                    <div>
+                        <div class="text-amber-400 text-lg mb-4">★★★★★</div>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-6">
+                            "Yang paling saya suka adalah transparansi datanya. Setiap minggu ada evaluasi jelas mana iklan yang efektif dan mana yang harus diganti. Sangat profesional dan komunikatif."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3.5 pt-4 border-t border-slate-200/70 dark:border-slate-800">
+                        <img src="https://placehold.co/48x48/0ea5e9/ffffff?text=HW" onerror="this.onerror=null;this.src='https://placehold.co/48x48/cbd5e1/475569?text=HW';" alt="Hendra Wijaya" class="w-11 h-11 rounded-full object-cover">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-900 dark:text-white">Hendra Wijaya</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Direktur, Griya Nusantara Properti</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-slate-900/70 rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
+                    <div>
+                        <div class="text-amber-400 text-lg mb-4">★★★★★</div>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-6">
+                            "Landing page baru yang mereka buatkan berhasil menaikkan konversi booking klinik kami hingga 2 kali lipat. Investasi terbaik untuk pertumbuhan cabang baru kami."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3.5 pt-4 border-t border-slate-200/70 dark:border-slate-800">
+                        <img src="https://placehold.co/48x48/10b981/ffffff?text=DA" onerror="this.onerror=null;this.src='https://placehold.co/48x48/cbd5e1/475569?text=DA';" alt="dr. Amanda" class="w-11 h-11 rounded-full object-cover">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-900 dark:text-white">dr. Amanda Larasati</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Owner, Aurelia Aesthetic Clinic</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FAQ ACCORDION ==================== -->
+    <section id="faq" class="py-16 sm:py-20 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10 sm:mb-12">
+                <span class="inline-block px-3.5 py-1 rounded-full bg-indigo-100 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 text-xs font-bold uppercase tracking-wider mb-3">Pertanyaan Umum</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Sering Ditanyakan Klien</h2>
+            </div>
+
+            <div class="space-y-3.5 sm:space-y-4" id="faq-list">
+                <!-- FAQ Item 1 -->
+                <div class="faq-item bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <button type="button" class="faq-trigger w-full flex items-center justify-between p-4 sm:p-5 text-left font-bold text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors">
+                        <span class="text-sm sm:text-base pr-4">Apakah biaya paket sudah termasuk budget iklan (Ad Spend)?</span>
+                        <svg class="faq-icon w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div class="faq-content hidden px-4 sm:px-5 pb-5 text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-3">
+                        Biaya paket merupakan jasa manajemen tim ahli, strategi, pembuatan konten kreatif, dan pelaporan. Budget iklan dibayarkan langsung oleh Anda ke akun iklan milik bisnis Anda sendiri (Meta/Google/TikTok) demi transparansi 100% dan kepemilikan penuh data audiens.
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="faq-item bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <button type="button" class="faq-trigger w-full flex items-center justify-between p-4 sm:p-5 text-left font-bold text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors">
+                        <span class="text-sm sm:text-base pr-4">Berapa lama biasanya hasil mulai terlihat?</span>
+                        <svg class="faq-icon w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div class="faq-content hidden px-4 sm:px-5 pb-5 text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-3">
+                        Untuk <strong class="text-slate-900 dark:text-slate-200">Performance Ads</strong>, trafik dan leads biasanya mulai masuk dalam 3–7 hari pertama sejak iklan aktif, dan fase optimasi stabil (winning campaign) tercapai pada minggu ke-3 hingga ke-6. Sementara untuk <strong class="text-slate-900 dark:text-slate-200">SEO</strong>, peningkatan peringkat organik signifikan umumnya terlihat dalam 3–6 bulan.
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="faq-item bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <button type="button" class="faq-trigger w-full flex items-center justify-between p-4 sm:p-5 text-left font-bold text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors">
+                        <span class="text-sm sm:text-base pr-4">Apakah ada minimal durasi kontrak kerja sama?</span>
+                        <svg class="faq-icon w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div class="faq-content hidden px-4 sm:px-5 pb-5 text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-3">
+                        Kami merekomendasikan komitmen awal selama 3 bulan agar algoritma iklan memiliki cukup data untuk fase testing dan scaling. Namun, tersedia juga opsi uji coba bulanan tanpa kontrak jangka panjang yang mengikat.
+                    </div>
+                </div>
+
+                <!-- FAQ Item 4 -->
+                <div class="faq-item bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <button type="button" class="faq-trigger w-full flex items-center justify-between p-4 sm:p-5 text-left font-bold text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors">
+                        <span class="text-sm sm:text-base pr-4">Bisnis saya berada di luar Jakarta, apakah tetap bisa bekerja sama?</span>
+                        <svg class="faq-icon w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div class="faq-content hidden px-4 sm:px-5 pb-5 text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-3">
+                        Tentu saja! Lebih dari 60% klien kami berasal dari berbagai kota di Indonesia seperti Medan, Surabaya, Bandung, Makassar, dan Bali. Seluruh koordinasi, pengiriman sampel produk untuk konten, hingga meeting mingguan berjalan lancar secara online.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FORM KONSULTASI GRATIS (LEAD GEN) ==================== -->
+    <section id="konsultasi" class="py-16 sm:py-20 lg:py-28 bg-white dark:bg-slate-950 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-3xl sm:rounded-[2rem] p-5 sm:p-10 lg:p-14 shadow-2xl border border-slate-800 overflow-hidden relative">
+                <div class="pointer-events-none absolute -top-20 -right-20 w-72 sm:w-80 h-72 sm:h-80 bg-indigo-500/20 rounded-full blur-3xl"></div>
+
+                <div class="relative grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                    <!-- Kiri: Info Konsultasi -->
+                    <div class="lg:col-span-5 text-white">
+                        <span class="inline-block px-3.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold uppercase tracking-wider mb-4">
+                            Kuota Terbatas: 5 Brand / Bulan
+                        </span>
+                        <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight mb-4 sm:mb-5">
+                            Dapatkan Sesi Audit & Strategi Digital Gratis (Senilai Rp 2,5 Juta)
+                        </h2>
+                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed mb-7 sm:mb-8">
+                            Isi formulir di samping. Tim strategist kami akan membedah potensi pasar, celah iklan kompetitor, dan menyusun roadmap pertumbuhan khusus untuk bisnis Anda dalam 1x24 jam.
+                        </p>
+
+                        <!-- Kontak Langsung dengan Fitur Salin -->
+                        <div class="space-y-3 pt-4 border-t border-slate-800">
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Atau Hubungi Langsung</p>
+                            <div class="flex flex-wrap gap-2.5 sm:gap-3">
+                                <button type="button" onclick="copyText('halo@nusagrowth.id', 'Email berhasil disalin!')" class="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs sm:text-sm font-medium text-slate-200 transition-colors">
+                                    <svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                    halo@nusagrowth.id
+                                    <span class="text-[10px] text-slate-400">(Salin)</span>
+                                </button>
+                                <button type="button" onclick="copyText('0812-8890-4500', 'Nomor WhatsApp berhasil disalin!')" class="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs sm:text-sm font-medium text-slate-200 transition-colors">
+                                    <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                    </svg>
+                                    0812-8890-4500
+                                    <span class="text-[10px] text-slate-400">(Salin)</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kanan: Form Interaktif -->
+                    <div class="lg:col-span-7">
+                        <form id="consultation-form" class="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-xl border border-transparent dark:border-slate-800 space-y-4 sm:space-y-5 transition-colors duration-300">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                                <div>
+                                    <label for="input-name" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1.5">Nama Lengkap *</label>
+                                    <input type="text" id="input-name" required placeholder="Contoh: Budi Santoso" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
+                                </div>
+                                <div>
+                                    <label for="input-brand" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1.5">Nama Bisnis / Brand *</label>
+                                    <input type="text" id="input-brand" required placeholder="Contoh: Kopi Nusantara" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                                <div>
+                                    <label for="input-wa" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1.5">Nomor WhatsApp *</label>
+                                    <input type="tel" id="input-wa" required placeholder="0812xxxxxxxx" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
+                                </div>
+                                <div>
+                                    <label for="input-package" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1.5">Paket / Layanan Diminati</label>
+                                    <select id="input-package" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 text-sm text-slate-900 dark:text-white bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
+                                        <option value="Konsultasi & Audit Gratis">Konsultasi & Audit Gratis Dulu</option>
+                                        <option value="Starter UMKM (Rp 4,5 jt/bln)">Starter UMKM (Rp 4,5 jt/bln)</option>
+                                        <option value="Growth Accelerator (Rp 9,5 jt/bln)">Growth Accelerator (Rp 9,5 jt/bln)</option>
+                                        <option value="Scale & Enterprise (Custom)">Scale & Enterprise (Custom)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="input-budget" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1.5">Rencana Budget Iklan Bulanan</label>
+                                <select id="input-budget" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 text-sm text-slate-900 dark:text-white bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
+                                    <option value="< Rp 10 Juta">Di bawah Rp 10 Juta / bulan</option>
+                                    <option value="Rp 10 Juta - Rp 30 Juta" selected>Rp 10 Juta – Rp 30 Juta / bulan</option>
+                                    <option value="Rp 30 Juta - Rp 75 Juta">Rp 30 Juta – Rp 75 Juta / bulan</option>
+                                    <option value="> Rp 75 Juta">Di atas Rp 75 Juta / bulan</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="input-goal" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1.5">Target atau Tantangan Utama Saat Ini</label>
+                                <textarea id="input-goal" rows="3" placeholder="Ceritakan singkat produk Anda atau kendala pemasaran yang ingin diselesaikan..." class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full py-3.5 sm:py-4 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm sm:text-base shadow-lg shadow-indigo-600/25 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                                Kirim & Jadwalkan Audit Gratis
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                </svg>
+                            </button>
+
+                            <p class="text-center text-xs text-slate-500 dark:text-slate-400">
+                                Data Anda 100% aman dan terjaga kerahasiaannya (NDA tersedia atas permintaan).
+                            </p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="bg-slate-950 text-slate-400 py-12 sm:py-14 border-t border-slate-900 dark:border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 pb-10 border-b border-slate-800/80">
+                <div class="sm:col-span-2">
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                        </div>
+                        <span class="text-xl font-extrabold text-white">Nusa<span class="text-indigo-400">Growth</span></span>
+                    </div>
+                    <p class="text-sm text-slate-400 max-w-md leading-relaxed mb-4">
+                        Partner pertumbuhan digital berbasis data untuk UMKM, D2C brand, dan perusahaan di seluruh Indonesia. Fokus pada ROI, efisiensi biaya iklan, dan skala jangka panjang.
+                    </p>
+                    <p class="text-xs text-slate-500">
+                        Menara Karya Lt. 12, Jakarta Selatan & Hub Operasional Medan, Indonesia.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Navigasi</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="#layanan" class="hover:text-white transition-colors">Layanan Kami</a></li>
+                        <li><a href="#kalkulator" class="hover:text-white transition-colors">Simulasi ROI</a></li>
+                        <li><a href="#portofolio" class="hover:text-white transition-colors">Studi Kasus</a></li>
+                        <li><a href="#harga" class="hover:text-white transition-colors">Paket Harga</a></li>
+                        <li><a href="#faq" class="hover:text-white transition-colors">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Layanan Populer</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="#konsultasi" class="hover:text-white transition-colors">Jasa Meta & TikTok Ads</a></li>
+                        <li><a href="#konsultasi" class="hover:text-white transition-colors">Jasa Google Ads & SEO</a></li>
+                        <li><a href="#konsultasi" class="hover:text-white transition-colors">Pembuatan Landing Page</a></li>
+                        <li><a href="#konsultasi" class="hover:text-white transition-colors">Produksi Video UGC</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 text-center sm:text-left">
+                <p>&copy; 2026 NusaGrowth Digital Agency. Hak Cipta Dilindungi.</p>
+                <div class="flex items-center gap-6">
+                    <a href="#konsultasi" class="hover:text-slate-300 transition-colors">Kebijakan Privasi</a>
+                    <a href="#konsultasi" class="hover:text-slate-300 transition-colors">Syarat & Ketentuan</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== MODAL DETAIL STUDI KASUS ==================== -->
+    <div id="case-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/75 backdrop-blur-sm p-4 overflow-y-auto">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative my-auto">
+            <button type="button" onclick="closeCaseModal()" aria-label="Tutup modal" class="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <span id="modal-tag" class="inline-block px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-bold mb-3"></span>
+            <h3 id="modal-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mb-3 pr-8"></h3>
+            <p id="modal-challenge" class="text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed"></p>
+            <div class="bg-slate-50 dark:bg-slate-800/70 rounded-2xl p-4 border border-slate-200 dark:border-slate-700/70 mb-5">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Langkah Strategis Kami</h4>
+                <ul id="modal-steps" class="space-y-2 text-sm text-slate-700 dark:text-slate-300"></ul>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-2 bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-emerald-500/30 rounded-2xl p-4 mb-6">
+                <span class="text-xs font-bold text-emerald-800 dark:text-emerald-300 uppercase">Hasil Utama</span>
+                <span id="modal-result" class="text-sm sm:text-base font-extrabold text-emerald-700 dark:text-emerald-400"></span>
+            </div>
+            <a href="#konsultasi" onclick="closeCaseModal()" class="block w-full text-center py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-colors">
+                Ingin Hasil Serupa? Konsultasi Gratis
+            </a>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL SUKSES FORMULIR ==================== -->
+    <div id="success-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/75 backdrop-blur-sm p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-5">
+                <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mb-2">Permintaan Diterima!</h3>
+            <p id="success-modal-desc" class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+                Terima kasih telah menghubungi NusaGrowth. Tim strategist kami akan segera menghubungi Anda melalui WhatsApp dalam waktu maksimal 1x24 jam kerja.
+            </p>
+            <button type="button" onclick="closeSuccessModal()" class="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-colors">
+                Kembali ke Halaman
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== JAVASCRIPT INTERAKTIF ==================== -->
+    <script>
+        /**
+         * Inisialisasi seluruh fitur interaktif landing page setelah DOM siap.
+         * Mencakup: Pengalih Tema Gelap/Terang, Menu Mobile, Kalkulator ROI,
+         * Filter Portofolio, Toggle Harga, FAQ Accordion, dan Validasi Formulir.
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                initThemeToggle();
+                initMobileMenu();
+                initROICalculator();
+                initPortfolioFilter();
+                initBillingToggle();
+                initFAQAccordion();
+                initConsultationForm();
+            } catch (error) {
+                console.error('Terjadi kesalahan saat inisialisasi aplikasi:', error);
+            }
+        });
+
+        /* -------------------- 0. PENGALIH TEMA GELAP / TERANG -------------------- */
+        function initThemeToggle() {
+            const toggleBtn = document.getElementById('theme-toggle-btn');
+            const labelText = document.getElementById('theme-label-text');
+            if (!toggleBtn) return;
+
+            // Sinkronisasi teks tombol dengan status tema saat ini
+            const updateThemeLabel = () => {
+                const isDark = document.documentElement.classList.contains('dark');
+                if (labelText) {
+                    labelText.textContent = isDark ? 'Terang' : 'Gelap';
+                }
+                toggleBtn.setAttribute('aria-pressed', String(isDark));
+            };
+
+            updateThemeLabel();
+
+            toggleBtn.addEventListener('click', () => {
+                try {
+                    const htmlEl = document.documentElement;
+                    const willBeDark = !htmlEl.classList.contains('dark');
+
+                    htmlEl.classList.toggle('dark', willBeDark);
+                    updateThemeLabel();
+
+                    try {
+                        localStorage.setItem('nusagrowth-theme', willBeDark ? 'dark' : 'light');
+                    } catch (storageErr) {
+                        // Tetap lanjut jika localStorage dibatasi
+                    }
+
+                    showToast(willBeDark ? 'Mode Gelap diaktifkan' : 'Mode Terang diaktifkan');
+                } catch (err) {
+                    console.error('Gagal mengganti tema:', err);
+                }
+            });
+        }
+
+        /* -------------------- 1. NOTIFIKASI TOAST -------------------- */
+        function showToast(message, type = 'success') {
+            try {
+                const container = document.getElementById('toast-container');
+                if (!container) return;
+
+                const toast = document.createElement('div');
+                const bgClass = type === 'error'
+                    ? 'bg-rose-600 text-white'
+                    : 'bg-slate-900 dark:bg-slate-800 text-white border border-slate-700/80';
+                const iconColor = type === 'error' ? 'text-rose-200' : 'text-emerald-400';
+
+                toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl shadow-xl text-sm font-medium transition-all duration-300 ${bgClass}`;
+                toast.innerHTML = `
+                    <span class="${iconColor} font-bold text-base">${type === 'error' ? '!' : '✓'}</span>
+                    <span>${message}</span>
+                `;
+
+                container.appendChild(toast);
+
+                // Hapus toast otomatis setelah 3.2 detik
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'translate-y-2');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3200);
+            } catch (err) {
+                console.error('Gagal menampilkan toast:', err);
+            }
+        }
+
+        /* -------------------- 2. SALIN TEKS KE CLIPBOARD -------------------- */
+        function copyText(text, successMsg) {
+            try {
+                const tempInput = document.createElement('textarea');
+                tempInput.value = text;
+                tempInput.style.position = 'fixed';
+                tempInput.style.opacity = '0';
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                showToast(successMsg || 'Berhasil disalin!');
+            } catch (err) {
+                console.error('Gagal menyalin teks:', err);
+                showToast('Gagal menyalin teks. Silakan salin secara manual.', 'error');
+            }
+        }
+
+        /* -------------------- 3. MENU MOBILE RESPONSIF -------------------- */
+        function initMobileMenu() {
+            const btn = document.getElementById('mobile-menu-btn');
+            const menu = document.getElementById('mobile-menu');
+            const iconOpen = document.getElementById('menu-icon-open');
+            const iconClose = document.getElementById('menu-icon-close');
+            const navLinks = document.querySelectorAll('.mobile-nav-link');
+
+            if (!btn || !menu) return;
+
+            const setMenuState = (open) => {
+                menu.classList.toggle('hidden', !open);
+                iconOpen.classList.toggle('hidden', open);
+                iconClose.classList.toggle('hidden', !open);
+                btn.setAttribute('aria-expanded', String(open));
+            };
+
+            btn.addEventListener('click', () => {
+                const isHidden = menu.classList.contains('hidden');
+                setMenuState(isHidden);
+            });
+
+            // Tutup menu saat tautan diklik
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => setMenuState(false));
+            });
+
+            // Tutup menu otomatis saat layar diperbesar ke desktop
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024) {
+                    setMenuState(false);
+                }
+            });
+        }
+
+        /* -------------------- 4. KALKULATOR ESTIMASI ROI -------------------- */
+        function initROICalculator() {
+            const slider = document.getElementById('budget-slider');
+            const budgetDisplay = document.getElementById('budget-display');
+            const estRevenue = document.getElementById('est-revenue');
+            const estReach = document.getElementById('est-reach');
+            const estLeads = document.getElementById('est-leads');
+            const roasBadge = document.getElementById('roas-badge');
+            const industryBtns = document.querySelectorAll('.industry-btn');
+            const applyBtn = document.getElementById('apply-calc-btn');
+
+            if (!slider) return;
+
+            // Benchmark estimasi per industri (ROAS, biaya per lead/order, jangkauan per 1 juta)
+            const benchmarks = {
+                ecommerce: { roas: 4.8, cpl: 20000, reachPerMil: 16600, label: 'Fashion & Beauty' },
+                fnb: { roas: 4.2, cpl: 15000, reachPerMil: 22000, label: 'Kuliner & F&B' },
+                jasa: { roas: 5.5, cpl: 35000, reachPerMil: 14000, label: 'Jasa & Klinik' },
+                properti: { roas: 6.5, cpl: 85000, reachPerMil: 11000, label: 'Properti & B2B' }
+            };
+
+            let activeIndustry = 'ecommerce';
+
+            const formatIDR = (num) => {
+                return 'Rp ' + Math.round(num).toLocaleString('id-ID');
+            };
+
+            const updateCalculation = () => {
+                const budget = parseInt(slider.value, 10) || 25000000;
+                const data = benchmarks[activeIndustry];
+
+                const revenue = budget * data.roas;
+                const reach = Math.round((budget / 1000000) * data.reachPerMil);
+                const leads = Math.round(budget / data.cpl);
+
+                budgetDisplay.textContent = formatIDR(budget);
+                estRevenue.textContent = formatIDR(revenue);
+                estReach.textContent = reach.toLocaleString('id-ID') + '+';
+                estLeads.textContent = leads.toLocaleString('id-ID') + '+';
+                roasBadge.textContent = `Est. ROAS ${data.roas}x`;
+            };
+
+            // Listener perubahan tombol industri
+            industryBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    activeIndustry = btn.dataset.industry;
+                    industryBtns.forEach(b => {
+                        b.className = 'industry-btn p-3.5 rounded-2xl text-left border border-slate-700 bg-slate-900/50 text-slate-300 hover:border-slate-500 transition-all';
+                    });
+                    btn.className = 'industry-btn p-3.5 rounded-2xl text-left border-2 border-indigo-500 bg-indigo-600/20 text-white transition-all';
+                    updateCalculation();
+                });
+            });
+
+            // Listener pergeseran slider
+            slider.addEventListener('input', updateCalculation);
+
+            // Tombol terapkan hasil kalkulator ke form konsultasi
+            if (applyBtn) {
+                applyBtn.addEventListener('click', () => {
+                    const budget = parseInt(slider.value, 10);
+                    const budgetSelect = document.getElementById('input-budget');
+                    const goalInput = document.getElementById('input-goal');
+
+                    if (budgetSelect) {
+                        if (budget < 10000000) budgetSelect.value = '< Rp 10 Juta';
+                        else if (budget <= 30000000) budgetSelect.value = 'Rp 10 Juta - Rp 30 Juta';
+                        else if (budget <= 75000000) budgetSelect.value = 'Rp 30 Juta - Rp 75 Juta';
+                        else budgetSelect.value = '> Rp 75 Juta';
+                    }
+
+                    if (goalInput) {
+                        goalInput.value = `Saya tertarik berdiskusi strategi untuk industri ${benchmarks[activeIndustry].label} dengan estimasi budget iklan ${formatIDR(budget)}/bulan.`;
+                    }
+
+                    document.getElementById('konsultasi').scrollIntoView({ behavior: 'smooth' });
+                    showToast('Estimasi budget telah diisi otomatis ke formulir!');
+                });
+            }
+
+            updateCalculation();
+        }
+
+        /* -------------------- 5. FILTER PORTOFOLIO -------------------- */
+        function initPortfolioFilter() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const cards = document.querySelectorAll('.case-card');
+
+            const inactiveClasses = 'filter-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all';
+            const activeClasses = 'filter-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-indigo-600 text-white shadow-sm transition-all';
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const filter = btn.dataset.filter;
+
+                    // Perbarui gaya tombol aktif (mendukung Light & Dark Mode)
+                    filterBtns.forEach(b => { b.className = inactiveClasses; });
+                    btn.className = activeClasses;
+
+                    // Tampilkan/sembunyikan kartu
+                    cards.forEach(card => {
+                        const match = filter === 'all' || card.dataset.category === filter;
+                        card.classList.toggle('hidden', !match);
+                    });
+                });
+            });
+        }
+
+        /* -------------------- 6. MODAL DETAIL STUDI KASUS -------------------- */
+        const caseStudiesData = {
+            kala: {
+                tag: 'E-Commerce • Beauty & Skincare',
+                title: 'Kala Botanical Skincare',
+                challenge: 'Tantangan: Biaya akuisisi pelanggan (CPA) terus naik hingga menggerus margin keuntungan karena iklan hanya mengandalkan gambar katalog statis tanpa funnel retargeting.',
+                steps: [
+                    'Memproduksi 24 video pendek bergaya UGC (User-Generated Content) dengan hook masalah kulit.',
+                    'Menerapkan Conversion API (CAPI) agar pelacakan pembelian di website 98% akurat.',
+                    'Membangun kampanye retargeting khusus untuk keranjang belanja yang ditinggalkan.'
+                ],
+                result: 'Omzet +320% • ROAS 6.8x dalam 90 Hari'
+            },
+            kopi: {
+                tag: 'F&B • 12 Outlet & Retail Online',
+                title: 'Kopi Senja & Roastery',
+                challenge: 'Tantangan: Penjualan di jam sepi (siang hari) rendah dan produk biji kopi kemasan belum dikenal luas di luar kota domisili.',
+                steps: [
+                    'Menjalankan iklan radius lokal 5km di Instagram & TikTok dengan promo bundling jam makan siang.',
+                    'Aktivasi 35 food vlogger mikro di kota-kota cabang secara serentak.',
+                    'Optimasi iklan katalog marketplace untuk penjualan biji kopi kemasan ke seluruh Indonesia.'
+                ],
+                result: 'Kunjungan +185% • Retail Online 4.2x'
+            },
+            aurelia: {
+                tag: 'Klinik Kecantikan • Lead Generation',
+                title: 'Aurelia Aesthetic Clinic',
+                challenge: 'Tantangan: Banyak pesan masuk di WhatsApp namun kualitas prospek rendah (banyak yang hanya tanya harga tanpa jadi reservasi).',
+                steps: [
+                    'Merancang ulang landing page layanan unggulan lengkap dengan transparansi kisaran harga & bukti hasil.',
+                    'Menargetkan kata kunci Google Search dengan niat beli tinggi (High-Intent Keywords).',
+                    'Memfilter leads melalui formulir singkat sebelum diarahkan ke CS WhatsApp.'
+                ],
+                result: 'Biaya Per Lead -54% • 640+ Booking/Bln'
+            }
+        };
+
+        function openCaseModal(id) {
+            try {
+                const data = caseStudiesData[id];
+                const modal = document.getElementById('case-modal');
+                if (!data || !modal) return;
+
+                document.getElementById('modal-tag').textContent = data.tag;
+                document.getElementById('modal-title').textContent = data.title;
+                document.getElementById('modal-challenge').textContent = data.challenge;
+                document.getElementById('modal-result').textContent = data.result;
+
+                const stepsEl = document.getElementById('modal-steps');
+                stepsEl.innerHTML = data.steps.map(step => `<li class="flex items-start gap-2"><span class="text-indigo-600 dark:text-indigo-400 font-bold">✓</span><span>${step}</span></li>`).join('');
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } catch (err) {
+                console.error('Gagal membuka modal studi kasus:', err);
+            }
+        }
+
+        function closeCaseModal() {
+            const modal = document.getElementById('case-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        /* -------------------- 7. TOGGLE HARGA BULANAN / KUARTALAN -------------------- */
+        function initBillingToggle() {
+            const toggleBtn = document.getElementById('billing-toggle');
+            const dot = document.getElementById('billing-dot');
+            const labelMonthly = document.getElementById('label-monthly');
+            const labelQuarterly = document.getElementById('label-quarterly');
+            const priceElements = document.querySelectorAll('.price-value');
+
+            if (!toggleBtn) return;
+
+            let isQuarterly = false;
+
+            toggleBtn.addEventListener('click', () => {
+                isQuarterly = !isQuarterly;
+
+                if (isQuarterly) {
+                    dot.classList.remove('translate-x-0');
+                    dot.classList.add('translate-x-8');
+                    labelMonthly.className = 'text-sm font-medium text-slate-500 dark:text-slate-400 transition-colors';
+                    labelQuarterly.className = 'text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5 transition-colors';
+                } else {
+                    dot.classList.remove('translate-x-8');
+                    dot.classList.add('translate-x-0');
+                    labelQuarterly.className = 'text-sm font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1.5 transition-colors';
+                    labelMonthly.className = 'text-sm font-bold text-slate-900 dark:text-white transition-colors';
+                }
+
+                priceElements.forEach(el => {
+                    el.textContent = isQuarterly ? el.dataset.quarterly : el.dataset.monthly;
+                });
+            });
+        }
+
+        /* -------------------- 8. PILIH PAKET HARGA -------------------- */
+        function selectPackage(packageName) {
+            try {
+                const selectEl = document.getElementById('input-package');
+                if (selectEl) {
+                    selectEl.value = packageName;
+                }
+                document.getElementById('konsultasi').scrollIntoView({ behavior: 'smooth' });
+                showToast(`Paket "${packageName}" dipilih. Lengkapi data Anda di bawah.`);
+            } catch (err) {
+                console.error('Gagal memilih paket:', err);
+            }
+        }
+
+        /* -------------------- 9. FAQ ACCORDION -------------------- */
+        function initFAQAccordion() {
+            const triggers = document.querySelectorAll('.faq-trigger');
+
+            triggers.forEach(trigger => {
+                trigger.addEventListener('click', () => {
+                    const parent = trigger.closest('.faq-item');
+                    const content = parent.querySelector('.faq-content');
+                    const icon = trigger.querySelector('.faq-icon');
+                    const isOpen = !content.classList.contains('hidden');
+
+                    // Tutup semua FAQ lain agar rapi
+                    document.querySelectorAll('.faq-content').forEach(c => c.classList.add('hidden'));
+                    document.querySelectorAll('.faq-icon').forEach(i => i.classList.remove('rotate-180'));
+
+                    if (!isOpen) {
+                        content.classList.remove('hidden');
+                        icon.classList.add('rotate-180');
+                    }
+                });
+            });
+        }
+
+        /* -------------------- 10. FORMULIR KONSULTASI -------------------- */
+        function initConsultationForm() {
+            const form = document.getElementById('consultation-form');
+            if (!form) return;
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                try {
+                    const name = document.getElementById('input-name').value.trim();
+                    const brand = document.getElementById('input-brand').value.trim();
+                    const wa = document.getElementById('input-wa').value.trim();
+                    const pkg = document.getElementById('input-package').value;
+
+                    if (!name || !brand || !wa) {
+                        showToast('Mohon lengkapi nama, brand, dan nomor WhatsApp Anda.', 'error');
+                        return;
+                    }
+
+                    // Tampilkan modal sukses dengan personalisasi nama & brand
+                    const descEl = document.getElementById('success-modal-desc');
+                    if (descEl) {
+                        descEl.innerHTML = `Halo <strong class="text-slate-900 dark:text-white">${name}</strong>, permintaan audit untuk <strong class="text-slate-900 dark:text-white">${brand}</strong> (${pkg}) telah kami terima. Strategist kami akan segera menghubungi WhatsApp <strong class="text-slate-900 dark:text-white">${wa}</strong> dalam 1x24 jam kerja.`;
+                    }
+
+                    const modal = document.getElementById('success-modal');
+                    if (modal) {
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                    }
+
+                    form.reset();
+                } catch (err) {
+                    console.error('Gagal memproses formulir:', err);
+                    showToast('Terjadi kendala saat mengirim formulir. Silakan coba lagi.', 'error');
+                }
+            });
+        }
+
+        function closeSuccessModal() {
+            const modal = document.getElementById('success-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        // Tutup modal jika area backdrop diklik atau tombol Escape ditekan
+        window.addEventListener('click', (e) => {
+            if (e.target.id === 'case-modal') closeCaseModal();
+            if (e.target.id === 'success-modal') closeSuccessModal();
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCaseModal();
+                closeSuccessModal();
+            }
+        });
+    </script>
+</body>
+</html>
